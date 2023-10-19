@@ -15,7 +15,7 @@ function App() {
         <div>
           ここはメインページです
           <br />
-          ver.2
+          ver.3
         </div>
       )}
     </div>

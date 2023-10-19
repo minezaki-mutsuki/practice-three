@@ -9,7 +9,6 @@ export const LineAR = () => {
 
     // シーン作成
     const scene = new THREE.Scene();
-    console.log(`${ref.current.clientWidth}, ${ref.current.clientHeight}`);
 
     // カメラ作成
     const camera = new THREE.PerspectiveCamera(
@@ -24,35 +23,41 @@ export const LineAR = () => {
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
     ref.current.appendChild(renderer.domElement);
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then((stream) => {
+        const video = document.createElement("video");
+        video.srcObject = stream;
+        video.play();
 
-    // 3メートルの線の始点と終点を定義
-    const startPoint = new THREE.Vector3(0, 0, 0);
-    const endPoint = new THREE.Vector3(0, -3, 0);
+        // テクスチャとしてビデオを使用
+        const videoTexture = new THREE.VideoTexture(video);
+        videoTexture.minFilter = THREE.LinearFilter;
 
-    // 線のジオメトリを作成
-    const geometry = new THREE.BufferGeometry().setFromPoints([
-      startPoint,
-      endPoint,
-    ]);
+        // ビデオを背景に表示するマテリアル
+        const backgroundMaterial = new THREE.MeshBasicMaterial({
+          map: videoTexture,
+        });
+        const backgroundGeometry = new THREE.PlaneGeometry(2, 2);
+        const backgroundMesh = new THREE.Mesh(
+          backgroundGeometry,
+          backgroundMaterial
+        );
+        backgroundMesh.position.z = -1;
 
-    // 線の材質を設定
-    const material = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+        scene.add(backgroundMesh);
 
-    // 線オブジェクトを作成
-    const line = new THREE.Line(geometry, material);
+        const animate = () => {
+          requestAnimationFrame(animate);
 
-    // シーンに線を追加
-    scene.add(line);
+          renderer.render(scene, camera);
+        };
 
-    const animate = () => {
-      requestAnimationFrame(animate);
-
-      // アニメーション処理をここに追加
-
-      renderer.render(scene, camera);
-    };
-
-    animate();
+        animate();
+      })
+      .catch((error) => {
+        console.error("Error accessing camera:", error);
+      });
   }, []);
 
   return <div style={{ height: "100vh" }} ref={ref} />;
