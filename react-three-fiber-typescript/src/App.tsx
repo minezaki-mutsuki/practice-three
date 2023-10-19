@@ -9,7 +9,15 @@ function App() {
       <button onClick={() => setIsAR(!isAR)}>
         {isAR ? "メインに戻る" : "ARを試す"}
       </button>
-      {isAR ? <LineAR /> : <div>ここはメインページです</div>}
+      {isAR ? (
+        <LineAR />
+      ) : (
+        <div>
+          ここはメインページです
+          <br />
+          ver.2
+        </div>
+      )}
     </div>
   );
 }
