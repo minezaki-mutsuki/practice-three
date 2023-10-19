@@ -9,6 +9,7 @@ export const LineAR = () => {
 
     // シーン作成
     const scene = new THREE.Scene();
+    console.log(`${ref.current.clientWidth}, ${ref.current.clientHeight}`);
 
     // カメラ作成
     const camera = new THREE.PerspectiveCamera(
@@ -54,5 +55,5 @@ export const LineAR = () => {
     animate();
   }, []);
 
-  return <div ref={ref} />;
+  return <div style={{ height: "100vh" }} ref={ref} />;
 };
