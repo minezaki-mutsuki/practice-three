@@ -6,15 +6,37 @@ import { Canvas } from "@react-three/fiber";
 const ArCanvas = () => {
   return (
     <>
-      <Canvas>{/* ここに3DモデルやARコンテンツを配置 */}</Canvas>
+      <Canvas>
+        {/* Three.jsのシーン */}
+        <Scene />
+      </Canvas>
+    </>
+  );
+};
+
+const Scene = () => {
+  const triangleGeometry = new THREE.BufferGeometry();
+
+  const positions = new Float32Array([0, 0, 0, 1, 0, 0, 0.5, 1, 0]);
+
+  triangleGeometry.setAttribute(
+    "position",
+    new THREE.BufferAttribute(positions, 3)
+  );
+
+  const triangleMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const triangle = new THREE.Mesh(triangleGeometry, triangleMaterial);
+
+  return (
+    <>
+      {triangle}
+      {/* 他のARコンテンツを追加できます */}
     </>
   );
 };
 
 export const LineAR = () => {
   const [cameraReady, setCameraReady] = useState(false);
-
-  // Webcamコンポーネントへのrefを作成
   const webcamRef = useRef(null);
 
   useEffect(() => {
@@ -35,8 +57,6 @@ export const LineAR = () => {
       {cameraReady && (
         <div style={{ position: "relative", width: "100%", height: "100vh" }}>
           <ArCanvas />
-
-          {/* Webcamの映像を表示 */}
           <video
             autoPlay
             playsInline
@@ -46,19 +66,17 @@ export const LineAR = () => {
               left: 0,
               width: "100%",
               height: "100%",
-              zIndex: -1, // 3Dコンテンツの下に表示
+              zIndex: -1,
             }}
             ref={webcamRef}
           />
-
-          {/* テキストをWebcamの映像の上に重ねる */}
           <h1
             style={{
               position: "absolute",
               top: "20px",
               left: "20px",
-              zIndex: 1, // Webcamの映像の上に表示
-              color: "black", // テキストの色
+              zIndex: 1,
+              color: "white",
             }}
           >
             ああああ
