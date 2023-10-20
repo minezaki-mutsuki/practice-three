@@ -1,64 +1,45 @@
-import { useEffect, useRef } from "react";
+import { Fragment, MutableRefObject, useEffect, useRef, useState } from "react";
+import Webcam from "react-webcam";
 import * as THREE from "three";
+import { Canvas } from "@react-three/fiber";
+import { CapsuleModel } from "../view/cupsuleModel";
+
+const ArCanvas: React.FC = () => {
+  return (
+    <>
+      <Fragment>
+        <CapsuleModel
+          position={[100 * 2.5, 109, 109 * 2.5]}
+          color={"#efef22"}
+          distance={5}
+          renderDistance={5}
+          onClick={() => alert("onClick")}
+        />
+      </Fragment>
+
+      {/* eslint-disable-next-line react/no-unknown-property */}
+      <gridHelper args={[100]} />
+      {/* eslint-disable-next-line react/no-unknown-property */}
+      <fog attach="fog" color="#000" near={30} far={200} />
+      {/* {effector} */}
+    </>
+  );
+};
 
 export const LineAR = () => {
-  const ref = useRef<HTMLDivElement>(null);
+  const [cameraReady, setCameraReady] = useState(false);
 
-  useEffect(() => {
-    if (ref.current === null) return;
-
-    // シーン作成
-    const scene = new THREE.Scene();
-
-    // カメラ作成
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      ref.current.clientWidth / ref.current.clientHeight,
-      0.1,
-      1000
-    );
-    camera.position.set(0, 0, 5);
-
-    // レンダラーの作成
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(ref.current.clientWidth, ref.current.clientHeight);
-    ref.current.appendChild(renderer.domElement);
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((stream) => {
-        const video = document.createElement("video");
-        video.srcObject = stream;
-        video.play();
-
-        // テクスチャとしてビデオを使用
-        const videoTexture = new THREE.VideoTexture(video);
-        videoTexture.minFilter = THREE.LinearFilter;
-
-        // ビデオを背景に表示するマテリアル
-        const backgroundMaterial = new THREE.MeshBasicMaterial({
-          map: videoTexture,
-        });
-        const backgroundGeometry = new THREE.PlaneGeometry(2, 2);
-        const backgroundMesh = new THREE.Mesh(
-          backgroundGeometry,
-          backgroundMaterial
-        );
-        backgroundMesh.position.z = -1;
-
-        scene.add(backgroundMesh);
-
-        const animate = () => {
-          requestAnimationFrame(animate);
-
-          renderer.render(scene, camera);
-        };
-
-        animate();
-      })
-      .catch((error) => {
-        console.error("Error accessing camera:", error);
-      });
-  }, []);
-
-  return <div style={{ height: "100vh" }} ref={ref} />;
+  return (
+    <>
+      <Webcam
+        onUserMedia={() => setCameraReady(true)}
+        videoConstraints={{
+          facingMode: { exact: "environment" },
+        }}
+      />
+      <Canvas>
+        <ArCanvas />
+      </Canvas>
+    </>
+  );
 };
